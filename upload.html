@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Appointments | Dental Clinic</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <script src="shared.js" defer></script>
+</head>
+<body>
+<header>
+  <h1>Dental Clinic Portal</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="appointment.html">Book Appointment</a>
+    <a href="upload.html">Upload Data</a>
+    <a href="download.html">Download Data</a>
+    <a href="report.html">Generate Report</a>
+  </nav>
+</header>
+<main>
+  <h2>Upload Appointment Data</h2>
+  <p>Use this form to upload appointment data for an existing or new provider.</p>
+  <form id="uploadForm">
+    <div class="form-group">
+      <label for="providerSelect">Choose Existing Provider</label>
+      <select id="providerSelect">
+        <option value="">-- Select from list --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="providerInput">Or Enter New Provider Name</label>
+      <input type="text" id="providerInput" placeholder="Dr. Jane Doe">
+    </div>
+    <div class="form-group">
+      <label for="file">Excel File</label>
+      <input type="file" id="file" name="file" accept=".xlsx" required>
+    </div>
+    <button type="submit">Upload File</button>
+  </form>
+  <div id="uploadResponse"></div>
+
+  <script>
+    window.onload = function() {
+      populateUploadDropdown();
+    }
+
+    document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const selected = document.getElementById('providerSelect').value;
+      const custom = document.getElementById('providerInput').value.trim();
+      const provider = selected || custom;
+
+      if (!provider) {
+        document.getElementById('uploadResponse').innerHTML = "<p class='error'>Please select or enter a provider.</p>";
+        return;
+      }
+
+      const file = document.getElementById('file').files[0];
+      if (!file) {
+        document.getElementById('uploadResponse').innerHTML = "<p class='error'>Please choose a file to upload.</p>";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('provider', provider);
+      formData.append('file', file);
+
+      const response = await fetch(`${API_BASE}/upload-appointments`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const result = document.getElementById('uploadResponse');
+      if (response.ok) {
+        result.innerHTML = "<p class='success'>Upload successful. Appointments will be updated shortly.</p>";
+        e.target.reset();
+      } else {
+        result.innerHTML = "<p class='error'>Upload failed. Please try again later.</p>";
+      }
+    });
+  </script>
+</main>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Download Data | Dental Clinic</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
+  <script src="shared.js" defer></script>
+</head>
+<body>
+<header>
+  <h1>Dental Clinic Portal</h1>
+  <nav>
+    <a href="index.html">Home</a>
+    <a href="appointment.html">Book Appointment</a>
+    <a href="upload.html">Upload Data</a>
+    <a href="download.html">Download Data</a>
+    <a href="report.html">Generate Report</a>
+  </nav>
+</header>
+<main>
+  <h2>Generate Appointment Report</h2>
+  <form id="downloadForm">
+    <div class="form-group">
+      <label>Start Date</label>
+      <input type="date" name="startDate">
+    </div>
+    <div class="form-group">
+      <label>End Date</label>
+      <input type="date" name="endDate">
+    </div>
+    <div class="form-group">
+      <label>Select Practitioners:</label>
+      <div id="providerCheckboxes">Loading practitioners...</div>
+    </div>
+    <button type="submit">Generate PDF Report</button>
+  </form>
+  <div id="downloadResponse"></div>
+
+  <script>
+    window.onload = function() {
+      populatePractitionerOptions(document.getElementById('providerCheckboxes'), 'checkbox');
+    };
+    
+    document.getElementById('downloadForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = new FormData(form);
+      const params = new URLSearchParams(data);
+      const checkboxes = document.querySelectorAll('input[name="providers"]:checked');
+      checkboxes.forEach(cb => params.append('providers', cb.value));
+
+      const response = await fetch(`${API_BASE}/generate-report?` + params.toString());
+      if (!response.ok) {
+        document.getElementById('downloadResponse').innerHTML = "<p class='error'>Failed to download. Please try again.</p>";
+        return;
+      }
+      const blob = await response.blob();
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = 'report.pdf';
+      link.click();
+    });
+  </script>
+</main>
+</body>
+</html>

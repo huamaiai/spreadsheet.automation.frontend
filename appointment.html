@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Appointment | Dental Clinic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <h1>Dental Clinic Portal</h1>
+    <nav>
+        <a href="index.html">Home</a>
+        <a href="appointment.html">Book Appointment</a>
+        <a href="upload.html">Upload Data</a>
+        <a href="download.html">Download Data</a>
+        <a href="report.html">Generate Report</a>
+    </nav>
+</header>
+<main>
+
+<h2>Book Your Appointment</h2>
+<p>Please fill in your appointment details. We’ll confirm it as soon as possible.</p>
+<form id="appointmentForm">
+    <div class="form-group"><label for="name">Name</label><input type="text" id="name" name="name" required></div>
+    <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" required></div>
+    <div class="form-group"><label for="date">Date</label><input type="date" id="date" name="date" required></div>
+    <div class="form-group"><label for="time">Time</label><input type="time" id="time" name="time" required></div>
+    
+    <div class="form-group">
+        <label for="service">Service</label>
+        <select id="service" name="service" required>
+            <option value="">-- Select a service --</option>
+            <option value="Checkup">Checkup</option>
+            <option value="Teeth Cleaning">Teeth Cleaning</option>
+            <option value="Whitening">Whitening</option>
+            <option value="Filling">Filling</option>
+            <option value="Root Canal">Root Canal</option>
+            <option value="Braces">Braces</option>
+            <option value="Implant">Implant</option>
+            <option value="Extraction">Extraction</option>
+        </select>
+    </div>
+
+    <div class="form-group"><label for="notes">Notes</label><textarea id="notes" name="notes"></textarea></div>
+    <button type="submit">Book Appointment</button>
+</form>
+<div id="response"></div>
+
+<script>
+    document.getElementById('appointmentForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const data = Object.fromEntries(new FormData(form).entries());
+        
+        // Client-side validation
+        if (!data.name || !data.email || !data.date || !data.time || !data.service) {
+            document.getElementById('response').innerHTML = "<p class='error'>Please fill out all required fields.</p>";
+            return;
+        }
+
+        const response = await fetch('/submit-appointment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = document.getElementById('response');
+        if (response.status === 201) {
+            result.innerHTML = "<p class='success'>Thank you! Your appointment has been booked.</p>";
+            form.reset();
+        } else {
+            result.innerHTML = "<p class='error'>Submission failed. Please try again later.</p>";
+        }
+    });
+</script>
+
+</main>
+</body>
+</html>
