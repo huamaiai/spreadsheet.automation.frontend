@@ -5,6 +5,8 @@
     <title>Appointment | Dental Clinic</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    <script src="config.js"></script>
+    <script src="shared.js" defer></script>
 </head>
 <body>
 <header>
@@ -59,7 +61,7 @@
             return;
         }
 
-        const response = await fetch('/submit-appointment', {
+        const response = await fetch(`${API_BASE}/submit-appointment`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
